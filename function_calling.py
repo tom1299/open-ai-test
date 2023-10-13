@@ -1,3 +1,5 @@
+import openai
+
 # The following code contains a function that returns the current balance of a bank account
 # The account is identified by the account number
 # The account number is passed as an argument to the function
@@ -20,6 +22,14 @@ def get_balance(account_number: str) -> float:
     else:
         accounts[account_number] = 0
         return accounts[account_number]
+
+
+def get_account_numbers() -> list:
+    """
+    Return a list of account numbers
+    :return: A list of account numbers
+    """
+    return list(accounts.keys())
 
 
 # This python method is passed the name of a function and returns a dictionary representation of the function
@@ -54,8 +64,55 @@ def get_function_as_dict(function_name: str):
     function_signature_as_dict = {"name": function_name, "description": function.__doc__,
                                   "parameters": {"type": "object", "properties": {}, "required": []}}
     for parameter in function_signature.parameters:
+        parameter_type = function_signature.parameters[parameter].annotation.__name__
+        # The following dict contains the mapping between python types and openai types
+        # https://platform.openai.com/docs/api-reference/chat/create#chat/create-functions
+        type_mapping = {"str": "string", "float": "number", "int": "integer", "list": "array"}
+        parameter_type = type_mapping[parameter_type]
+
         function_signature_as_dict["parameters"]["properties"][parameter] = {
-            "type": function_signature.parameters[parameter].annotation.__name__ }
+            "type": parameter_type }
         function_signature_as_dict["parameters"]["required"].append(parameter)
 
     return function_signature_as_dict
+
+
+# The following function calls openais completion API with the function as a parameter
+# And a prompt that says "My account number is A-1234 and I want to know my balance"
+def get_balance_with_prompt(prompt: str) -> int:
+    # Create two messages:
+    # Role user: "My account number is A-1234 and I want to know my balance"
+    # Role system: "Banking account program"
+    messages = [{"role": "user", "content": prompt}, {"role": "system", "content": "Banking account program"}]
+
+    # Create a list of functions
+    functions = [get_function_as_dict("get_balance"), get_function_as_dict("get_account_numbers")]
+
+    # Pretty print the functions
+    import json
+    print(json.dumps(functions, indent=4))
+
+    # Call the chat completion API using the model "gpt-3.5-turbo-instruct" passing the messages and functions
+    # as parameters. Use the package openai
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-0613",
+        messages=messages,
+        functions=functions)["choices"][0]["message"]
+
+    # Check if the response contains a function call
+    # If so, call the function and return the result
+    # If not, return the response
+    if response.get("function_call"):
+        function_name = response["function_call"]["name"]
+
+        # Create a dictionary of functions in this module with the name as the key and the function as the value
+        all_functions = {function.__name__: function for function in globals().values() if callable(function)}
+        function_to_call = all_functions[function_name]
+        function_args = json.loads(response["function_call"]["arguments"])
+
+        # Given that function_args is a dictionary of arguments with the argument name as the key and the argument
+        # value as the value, we can call the function using the ** operator
+        return function_to_call(**function_args)
+    else:
+        raise Exception(f"No function call found in response for prompt: {prompt}")
