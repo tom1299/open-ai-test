@@ -40,6 +40,8 @@ def get_account_number(name: str) -> str:
     :param name: The name of the account holder
     :return: The account number
     """
+    if name not in names_to_account_numbers:
+        names_to_account_numbers[name] = "A-" + str(len(names_to_account_numbers))
     return names_to_account_numbers[name]
 
 
