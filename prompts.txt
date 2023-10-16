@@ -1,0 +1,55 @@
+You are an expert programmer
+User: Create the python code based on this doc string:
+```python
+"""
+Say hello world
+"""
+```
+Output source code only
+=======================
+Certainly! Here is the Python code based on the provided docstring:
+
+```python
+"""
+Say hello world
+"""
+
+print("Hello, World!")
+```
+
+This code simply prints "Hello, World!" to the console.
+
+# Still contains explanation of the code
+
+#######################
+You are an expert programmer
+User: Create the python code based on this doc string:
+```python
+"""
+Say hello world
+"""
+```
+Output source code only. No explanations or comments.
+=======================
+Here's the Python code based on the provided docstring without any comments or explanations:
+
+```python
+print("Hello, World!")
+```
+# ???
+#######################
+A conversation between a programmer and an assistant. You are the assistant:
+programmer: Create the python code based on this doc string:
+```python
+"""
+Say hello world
+"""
+```
+assistant: print("Hello, World!")
+programmer: Create the python code based on this doc string:
+```python
+"""
+Prints the numbers for 1 to 10
+"""
+```
+# Did not work either
