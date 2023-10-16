@@ -10,6 +10,8 @@ import openai
 
 accounts = {"A-1234": 100.00, "B-1234": 200.00, "C-1234": 300.00}
 
+names_to_account_numbers = {"John Doe": "A-1234", "Jane Tarzan": "B-1234", "Jack Daniels": "C-1234"}
+
 
 def get_balance(account_number: str) -> float:
     """
@@ -30,6 +32,15 @@ def get_account_numbers() -> list:
     :return: A list of account numbers
     """
     return list(accounts.keys())
+
+
+def get_account_number(name: str) -> str:
+    """
+    Return the account number for a given name
+    :param name: The name of the account holder
+    :return: The account number
+    """
+    return names_to_account_numbers[name]
 
 
 # This python method is passed the name of a function and returns a dictionary representation of the function
@@ -80,13 +91,18 @@ def get_function_as_dict(function_name: str):
 # The following function calls openais completion API with the function as a parameter
 # And a prompt that says "My account number is A-1234 and I want to know my balance"
 def get_balance_with_prompt(prompt: str) -> int:
+    """
+    Return the balance of the account number in the prompt
+    :param prompt: The prompt
+    :return: The balance of the account number in the prompt
+    """
     # Create two messages:
     # Role user: "My account number is A-1234 and I want to know my balance"
     # Role system: "Banking account program"
     messages = [{"role": "user", "content": prompt}, {"role": "system", "content": "Banking account program"}]
 
     # Create a list of functions
-    functions = [get_function_as_dict("get_balance"), get_function_as_dict("get_account_numbers")]
+    functions = [get_function_as_dict(function_name) for function_name in globals() if callable(globals()[function_name])]
 
     # Pretty print the functions
     import json
