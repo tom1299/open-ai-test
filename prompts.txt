@@ -53,3 +53,20 @@ Prints the numbers for 1 to 10
 """
 ```
 # Did not work either
+
+#######################
+Code generation
+Input: Create the python code based on this doc string:
+```python
+"""
+Say hello world
+"""
+```
+Output: print("Hello, World!")
+Input: Create the python code based on this doc string:
+```python
+"""
+Prints the numbers for 1 to 10
+"""
+```
+# Did not work either
