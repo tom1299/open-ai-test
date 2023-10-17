@@ -14,7 +14,7 @@ class TestFunctionCalling(unittest.TestCase):
             "type": "object",
             "properties": {
                 "account_number": {
-                    "type": "str"
+                    "type": "string"
                 }
             },
             "required": ["account_number"]
@@ -30,8 +30,11 @@ class TestFunctionCalling(unittest.TestCase):
         self.assertEqual(100, response)
         response = get_balance_with_prompt("Mon numéro de compte est A-1234 et je veux connaître mon solde")
         self.assertEqual(100, response)
+        # Even works for Hebrew
+        response = get_balance_with_prompt("מספר החשבון שלי הוא A-1234 ואני רוצה לדעת את היתרה שלי")
+        self.assertEqual(100, response)
         try:
-            response = get_balance_with_prompt("My social security number is A-1234 and I want to improve my work-life balance. How can I do that?")
+            get_balance_with_prompt("My social security number is A-1234 and I want to improve my work-life balance. How can I do that?")
         except Exception as e:
             self.assertIn("No function call found", str(e))
 
