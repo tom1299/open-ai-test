@@ -139,6 +139,8 @@ def get_balance_with_prompt(prompt: str) -> int:
         all_functions = {function.__name__: function for function in globals().values() if callable(function)}
         function_to_call = all_functions[function_name]
         function_args = json.loads(response["function_call"]["arguments"])
+        # Pretty print the arguments
+        print(json.dumps(function_args, indent=4))
 
         # Given that function_args is a dictionary of arguments with the argument name as the key and the argument
         # value as the value, we can call the function using the ** operator
