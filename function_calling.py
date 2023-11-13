@@ -1,4 +1,6 @@
+import logging
 import openai
+import http.client as http_client
 
 # The following code contains a function that returns the current balance of a bank account
 # The account is identified by the account number
@@ -11,6 +13,18 @@ import openai
 accounts = {"A-1234": 100.00, "B-1234": 200.00, "C-1234": 300.00}
 
 names_to_account_numbers = {"John Doe": "A-1234", "Jane Tarzan": "B-1234", "Jack Daniels": "C-1234"}
+
+
+# Enable debug logging
+http_client.HTTPConnection.debuglevel = 1
+logging.basicConfig()
+logging.getLogger().setLevel(logging.DEBUG)
+requests_log = logging.getLogger("requests.packages.urllib3")
+requests_log.setLevel(logging.DEBUG)
+requests_log.propagate = True
+
+# Enable debug for openai
+openai.debug = True
 
 
 def get_balance(account_number: str) -> float:

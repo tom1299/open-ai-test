@@ -95,4 +95,8 @@ exec(function_code, function_calling.__dict__)
 function = getattr(function_calling, "get_balance_for_customer")
 
 # Call the function and print the result
-print(function("John"))
+balance = function("John Doe")
+assert balance == 100
+
+balance = function("Jack the ripper")
+assert balance == 0
