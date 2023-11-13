@@ -1,5 +1,5 @@
-import random
 import re
+from typing import Dict
 
 
 class Item:
@@ -54,6 +54,9 @@ class Stock:
             if re.match(description, item[0].get_description()):
                 return item[1]
         return 0
+
+    def get_items(self) -> Dict[str, tuple[Item, int]]:
+        return self.items
 
     def __str__(self):
         return f"Stock(items={self.items})"

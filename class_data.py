@@ -22,4 +22,4 @@ def getclass_signatures(clazz) -> list:
 
 
 def getclass_help(clazz) -> str:
-    return pydoc.render_doc(clazz, "Help on %s")
+    return pydoc.plain(pydoc.render_doc(clazz, "Help on %s"))

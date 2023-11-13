@@ -188,7 +188,9 @@ class TestClassHelp(unittest.TestCase):
     def test_get_class_help_for_online_shop(self):
         help_strings = []
         for clazz in Item, Stock, Order, Customer, OnlineShop:
-            help_strings.append(getclass_help(clazz))
+            class_help = getclass_help(clazz)
+            help_strings.append(class_help)
+            print(class_help)
 
         assert len(help_strings) == 5
         assert "Item" in help_strings[0]
