@@ -1,5 +1,8 @@
 import json
 import random
+import unittest
+
+from class_data import getclass_help
 from online_shop import Item, Stock, Order, Customer, OnlineShop
 
 
@@ -158,21 +161,34 @@ def def_create_test_data():
     return online_shop
 
 
-if __name__ == '__main__':
-    online_shop = def_create_test_data()
+class TestDataTest(unittest.TestCase):
 
-    first_customer = None
-    # Get the customer with the id 1
-    for customer in online_shop.customers:
-        if customer.get_id() == "1":
-            first_customer = customer
-            break
+    def test_get_test_data(self):
+        online_shop = def_create_test_data()
 
-    # Verify that the customer has 10 orders
-    assert len(first_customer.get_order_history()) == 10
+        first_customer = None
+        # Get the customer with the id 1
+        for customer in online_shop.customers:
+            if customer.get_id() == "1":
+                first_customer = customer
+                break
 
-    # Verify that the first item of the first order of the customer is an iPhone with a quantity of 2
-    first_order = first_customer.get_order_history()[0]
-    first_item = first_order.get_items()[list(first_order.get_items().keys())[0]]
-    assert first_item[0].get_description() == "A phone from Apple"
-    assert first_item[1] == 2
+        # Verify that the customer has 10 orders
+        assert len(first_customer.get_order_history()) == 10
+
+        # Verify that the first item of the first order of the customer is an iPhone with a quantity of 2
+        first_order = first_customer.get_order_history()[0]
+        first_item = first_order.get_items()[list(first_order.get_items().keys())[0]]
+        assert first_item[0].get_description() == "A phone from Apple"
+        assert first_item[1] == 2
+
+
+class TestClassHelp(unittest.TestCase):
+
+    def test_get_class_help_for_online_shop(self):
+        help_strings = []
+        for clazz in Item, Stock, Order, Customer, OnlineShop:
+            help_strings.append(getclass_help(clazz))
+
+        assert len(help_strings) == 5
+        assert "Item" in help_strings[0]
