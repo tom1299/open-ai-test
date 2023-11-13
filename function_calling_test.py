@@ -37,4 +37,3 @@ class TestFunctionCalling(unittest.TestCase):
             get_balance_with_prompt("My social security number is A-1234 and I want to improve my work-life balance. How can I do that?")
         except Exception as e:
             self.assertIn("No function call found", str(e))
-
