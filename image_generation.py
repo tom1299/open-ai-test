@@ -9,6 +9,7 @@ import logging
 # Caution: Might print the openai key to the console
 import http.client as http_client
 
+
 if os.getenv("DEBUG"):
     http_client.HTTPConnection.debuglevel = 1
     logging.basicConfig()
@@ -21,12 +22,14 @@ if os.getenv("DEBUG"):
     
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+
 def generate_image(prompt):
     response = openai.Image.create(
         prompt=prompt,
         size="512x512",
     )
     return response
+
 
 def alter_image(prompt, original_image_path, mask_image_path=None):
     response = openai.Image.create_edit(
@@ -38,13 +41,15 @@ def alter_image(prompt, original_image_path, mask_image_path=None):
     )
     return response
 
+
 # Generate an image or a variation of an image
-# response = generate_image("Context: 8 bit computer game on the c64.\r\nTask: Generate an in game screenshot of the game M.U.L.E.")
+response = generate_image("Context: 8 bit computer game.\r\nTask: Create a gray scale image of"
+                          " Luke Skywalker writting source code on a computer terminal")
 
 # Get the absolute path of the image sample.png
-image_path = os.path.abspath("./images/sample.png")
-mask_path = os.path.abspath("./images/mask.png")
-response = alter_image("Add a volcano", image_path, mask_path)
+# image_path = os.path.abspath("./images/sample.png")
+# mask_path = os.path.abspath("./images/mask.png")
+# response = alter_image("Add a volcano", image_path, mask_path)
 
 # Display all urls of the image variations
 for choice in response["data"]:
