@@ -1,18 +1,16 @@
 import copy
-import json
-import openai
 import os
 import re
 
+import openai
+
 import online_shop
-from online_shop import Item, Stock, Order, Customer, OnlineShop
-from online_shop_code_generation import create_online_shop_prompt
+import online_shop_sandbox
+from online_shop_code_generation import create_class_data, create_online_shop_prompt
 from online_shop_test import def_create_test_data
 
 
-def extract_python_code(input_string):
-    start_marker = "```python"
-    end_marker = "```"
+def extract_python_code(input_string, start_marker="```python", end_marker="```"):
     start_index = input_string.find(start_marker)
     end_index = input_string.find(end_marker, start_index + len(start_marker))
 
@@ -36,44 +34,75 @@ def get_function_name(function_definition):
 openai.debug = True
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-with open("context-template.json", "r") as file:
-    context_template = json.load(file)
-
 classes = [online_shop.Item, online_shop.Stock, online_shop.Order, online_shop.Customer, online_shop.OnlineShop]
+class_data = create_class_data(classes)
+
+task_content_template = {
+    "role": "user",
+    "content": f"Context: Python software development"
+               f"Task: Create a function that only uses the classes from the module 'online_shop' and takes "
+               f"a single parameter of type 'online_shop.OnlineShop' and satisfies the following task:\n"
+}
+
+context_template2 = [
+    {
+        "role": "system",
+        "content": f"You are a software developer. You will create python functions using only classes "
+                   f"in the module 'online_shop'. The function should satisfy the task given by the user. "
+                   f"Only write the code of the function. "
+                   f"Do not include any imports"
+                   f"The module 'online_shop' contains the following classes: {class_data}"
+    },
+    {
+        "role": "user",
+        "content": task_content_template["content"] + "Get the item with the highest price"
+    },
+    {
+        "role": "system",
+        "content": "def get_highest_priced_item(shop: OnlineShop):     stock = shop.get_stock()     "
+                   "items = stock.get_items()      if not items:         return None  # Return None if there are "
+                   "no items in the stock.      highest_priced_item = max(items, key=lambda item: item.get_price())"
+                   "     return highest_priced_item"
+    }
+]
 
 online_shop = def_create_test_data()
 
-tasks = ["Get the customer with the most orders", "Get the item with the highest price"]
+tasks = ["Get the item with the highest price", "Get the customer with the most orders", "Get the mean price of an item from the customer with the most orders"]
 
 for task in tasks:
-    messages = copy.deepcopy(context_template)
-    prompt = create_online_shop_prompt(classes, task)
-    new_message = copy.deepcopy(messages[1])
-    new_message["content"] = prompt
+    new_message = copy.deepcopy(context_template2[1])
+    new_message["content"] = task_content_template["content"] + task
 
-    messages.append(new_message)
+    context_template2.append(new_message)
 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=messages,
+        messages=context_template2,
     )
 
     function_code = response["choices"][0]["message"]["content"]
+    print(function_code)
+
     if "```python" in function_code:
         function_code = extract_python_code(response["choices"][0]["message"]["content"])
+    elif "```" in function_code:
+        function_code = extract_python_code(response["choices"][0]["message"]["content"], "```")
 
-    print(function_code)
     function_name = get_function_name(function_code)
 
+    print(function_name)
+    print(function_code)
+
     # Add the function to this module
-    exec(function_code, globals())
+    exec(function_code, online_shop_sandbox.__dict__)
 
     globs = globals()
 
     # Get the function from using a string as the name
-    function = globals()[function_name]
+    function = getattr(online_shop_sandbox, function_name)
 
     result = function(online_shop)
     print(result)
 
-    context_template.append({"role": "system", "content": function_code})
+    context_template2.append({"role": "system", "content": function_code})

@@ -33,30 +33,45 @@ class Item:
         return f"Item(id={self.id}, name={self.name}, price={self.price}, description={self.description}, supplier={self.supplier}, category={self.category})"
 
 
+class StockItem(Item):
+    def __init__(self, id: str, name: str, price: float, description: str, supplier: str, category: str, quantity: int):
+        super().__init__(id, name, price, description, supplier, category)
+        self.quantity = quantity
+
+    def get_quantity(self) -> int:
+        return self.quantity
+
+    def __str__(self):
+        return f"StockItem(id={self.id}, name={self.name}, price={self.price}, description={self.description}, supplier={self.supplier}, category={self.category}, quantity={self.quantity})"
+
+
+# Refactor the class Stock to use StockItem instead of Item
 class Stock:
+
     def __init__(self):
         self.items = {}
 
     def add_item(self, item: Item, quantity: int):
-        self.items[item.get_id()] = (item, quantity)
+        stock_item = StockItem(item.get_id(), item.get_name(), item.get_price(), item.get_description(), item.get_supplier(), item.get_category(), quantity)
+        self.items[item.get_id()] = stock_item
 
     def get_quantity_by_id(self, id: str) -> int:
-        return self.items[id][1]
+        return self.items[id].get_quantity()
 
     def get_quantity_by_name_regex(self, name: str) -> int:
         for item in self.items.values():
-            if re.match(name, item[0].get_name()):
-                return item[1]
+            if re.match(name, item.get_name()):
+                return item.get_quantity()
         return 0
 
     def get_quantity_by_description_regex(self, description: str) -> int:
         for item in self.items.values():
-            if re.match(description, item[0].get_description()):
-                return item[1]
+            if re.match(description, item.get_description()):
+                return item.get_quantity()
         return 0
 
-    def get_items(self) -> Dict[str, tuple[Item, int]]:
-        return self.items
+    def get_items(self) -> [StockItem]:
+        return list(self.items.values())
 
     def __str__(self):
         return f"Stock(items={self.items})"

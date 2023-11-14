@@ -89,9 +89,6 @@ def def_create_test_data():
     for item in items.values():
         stock.add_item(item, random.randint(5, 100))
 
-    item = random.choice(list(items.values()))
-    stock.items[item.get_id()] = (item, 0)
-
     # Create five customers using some fictional values
     customers = {}
     customer = Customer("1", "John Doe", {"street": "Main Street", "number": "1", "city": "New York"}, [])
