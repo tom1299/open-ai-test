@@ -50,7 +50,7 @@ context_template2 = [
         "content": f"You are a software developer. You will create python functions using only classes "
                    f"in the module 'online_shop'. The function should satisfy the task given by the user. "
                    f"Only write the code of the function. "
-                   f"Do not include any imports"
+                   f"Do not use any imports"
                    f"The module 'online_shop' contains the following classes: {class_data}"
     },
     {
@@ -68,7 +68,7 @@ context_template2 = [
 
 online_shop = def_create_test_data()
 
-tasks = ["Get the item with the highest price", "Get the customer with the most orders", "Get the mean price of an item from the customer with the most orders"]
+tasks = ["Get the item with the lowest price", "Get the customer with the most orders", "Get all customers living in New York", "Get the most popular Item"]
 
 for task in tasks:
     new_message = copy.deepcopy(context_template2[1])
@@ -88,6 +88,9 @@ for task in tasks:
         function_code = extract_python_code(response["choices"][0]["message"]["content"])
     elif "```" in function_code:
         function_code = extract_python_code(response["choices"][0]["message"]["content"], "```")
+
+    if function_code.startswith("import"):
+        function_code = function_code[function_code.find("def"):]
 
     function_name = get_function_name(function_code)
 
